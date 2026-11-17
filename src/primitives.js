@@ -24,7 +24,7 @@ export function sphere(lat = 20, lon = 28) {
   for (let i = 0; i < lat; i++) {
     for (let j = 0; j < lon; j++) {
       const a = i * (lon + 1) + j, b = a + lon + 1;
-      idx.push(a, b, a + 1, b, b + 1, a + 1);
+      idx.push(a, a + 1, b, b, a + 1, b + 1);
     }
   }
   return build(p, n, idx);
@@ -60,7 +60,7 @@ export function cylinder(seg = 28) {
   }
   for (let j = 0; j < seg; j++) {
     const a = j * 2;
-    idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
   }
   for (const [y, ny] of [[0.5, 1], [-0.5, -1]]) {
     const c = p.length / 3;
@@ -86,7 +86,7 @@ export function cone(seg = 28) {
   }
   for (let j = 0; j < seg; j++) {
     const a = j * 2;
-    idx.push(a, a + 1, a + 3);
+    idx.push(a, a + 3, a + 1);
   }
   const c = p.length / 3;
   p.push(0, -0.5, 0); n.push(0, -1, 0);

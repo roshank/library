@@ -9,7 +9,7 @@ function rng(seed) {
   return () => { h = (Math.imul(h, 1664525) + 1013904223) >>> 0; return h / 4294967296; };
 }
 
-const PALETTE = ['#ff6b6b', '#ffa94d', '#ffd43b', '#69db7c', '#38d9a9', '#4dabf7', '#9775fa', '#f783ac', '#63e6be', '#a9e34b'];
+const PALETTE = ['#b37560', '#da974b', '#cbb34e', '#7a9f4b', '#609f8a', '#6790b3', '#8b75b3', '#b3758a', '#7cb39f', '#9fb34e'];
 
 function kindFor(word, r) {
   const w = word.toLowerCase();
@@ -38,7 +38,7 @@ export function buildMystery(word) {
       const th = r() * Math.PI * 2, ph = Math.acos(2 * r() - 1), rad = 30 + r() * 8;
       parts.push(sphere([rad * Math.sin(ph) * Math.cos(th), rad * Math.cos(ph) * 0.6 + 4, rad * Math.sin(ph) * Math.sin(th)], 0.08 + r() * 0.12, '#fff', { emissive: true, color2: '#fff', fit: false }));
     }
-    return { parts, scene: { sky: ['#05071a', '#1b1f4a'], ground: '#000', space: true } };
+    return { parts, scene: { sky: ['#03040d', '#0d122c'], ground: '#000', space: true, sun: [0.6, 0.3, 0.55], sunPower: 3.6, fog: 0 }, mesh: 'parts' };
   }
 
   const size = 0.8 + r() * 0.6;
@@ -54,7 +54,7 @@ export function buildMystery(word) {
   const headS = (0.45 + r() * 0.3) * size;
   const ha = [bob(0.05, 2.4, 0.5)];
   parts.push(sphere([hx + headS * 0.5, hy + 0.05, 0], [headS * 1.2, headS, headS], color, { anim: ha }));
-  if (kind === 'bird' || r() > 0.5) parts.push(cone([hx + headS * 1.7, hy - 0.05, 0], [headS * 0.3, headS * 0.9, headS * 0.3], kind === 'bird' ? '#ffb703' : lighten(color, 0.2), { rot: [0, 0, -90], anim: ha }));
+  if (kind === 'bird' || r() > 0.5) parts.push(cone([hx + headS * 1.7, hy - 0.05, 0], [headS * 0.3, headS * 0.9, headS * 0.3], kind === 'bird' ? '#ffee04' : lighten(color, 0.2), { rot: [0, 0, -90], anim: ha }));
   parts.push(...eyes([hx + headS * 0.9, hy + headS * 0.3, 0], headS * 0.5, headS * 0.28, { anim: ha }));
   if (r() > 0.5) parts.push(...[-1, 1].map((s) => cone([hx + headS * 0.3, hy + headS * 0.8, s * headS * 0.5], [headS * 0.2, headS * 0.8, headS * 0.2], color2, { rot: [0, 0, -20], anim: ha })));
 
@@ -66,7 +66,7 @@ export function buildMystery(word) {
     parts.push(...legs4({ frontX: bodyScale[0] * 0.55, backX: -bodyScale[0] * 0.55, len: bodyY - bodyScale[1] * 0.4, thick: 0.22 * size, color, spreadZ: bodyScale[2] * 0.6 }));
   } else if (kind === 'bird' || kind === 'bug') {
     for (const s of [-1, 1]) parts.push(wing({ root: [0, bodyY, s * bodyScale[2] * 0.5], span: 2.4 * size, chord: 0.9 * size, color: color2, side: s, flap: 0.6, speed: kind === 'bug' ? 14 : 3 }));
-    for (const s of [-1, 1]) parts.push(cyl([0, bodyY - bodyScale[1] - 0.2, s * 0.25], [0.05, 0.5, 0.05], '#ffb703', { anim: a }));
+    for (const s of [-1, 1]) parts.push(cyl([0, bodyY - bodyScale[1] - 0.2, s * 0.25], [0.05, 0.5, 0.05], '#ffee04', { anim: a }));
   } else if (kind === 'fish') {
     parts.push(cone([0, bodyY + bodyScale[1] * 0.9, 0], [0.2, 0.8 * size, 0.5 * size], color2, { rot: [0, 0, 20], anim: a }));
     for (const s of [-1, 1]) parts.push(cone([0.3, bodyY - 0.2, s * bodyScale[2] * 0.9], [0.15, 0.7 * size, 0.35 * size], color2, { rot: [s * 100, 0, 20], anim: a }));
@@ -76,16 +76,19 @@ export function buildMystery(word) {
   if (kind !== 'bug') parts.push(...tail({ start: [-bodyScale[0] * 0.9, bodyY, 0], len: (1 + r() * 2.2) * size, segs: 6, radius: 0.3 * size, angle: r() * 30, curl: r() * 0.6, color, color2, pattern, patternScale: 2 }));
 
   const scene = kind === 'fish'
-    ? { sky: ['#4aa3ff', '#cfe9ff'], ground: '#2f7fc2' }
-    : { sky: ['#b6e0ff', '#fff3e0'], ground: ['#8cd16a', '#f3c6a2', '#c9b6ff', '#ffe08a'][Math.floor(r() * 4)] };
+    ? { sky: ['#60baff', '#cfe3f2'], ground: '#287cb3', groundType: 'water', sun: [0.4, 0.7, 0.55] }
+    : { sky: ['#78cfff', '#a3c3df'], ground: ['#7cb34e', '#e5c075', '#609841', '#b38f6b'][Math.floor(r() * 4)], groundType: ['grass', 'sand', 'grass', 'rock'][Math.floor(r() * 4)], sun: [0.4, 0.7, 0.55] };
   const flyer = kind === 'bird' || kind === 'bug';
-  return { parts: flyer ? parts : ground(parts), scene };
+  const material = kind === 'dino' ? { skin: 'scales', pattern: 'mottle', rough: 0.62, sss: 0.3 }
+    : kind === 'fish' ? { skin: 'smooth', pattern: 'mottle', rough: 0.3, sss: 0.3 }
+    : { skin: 'fur', pattern: 'mottle', rough: 0.75, sss: 0.4 };
+  return { parts: flyer ? parts : ground(parts), scene, mesh: 'organic', material };
 }
 
 export function mysteryConcept(word) {
   const pretty = word.trim().replace(/\s+/g, ' ');
   const title = pretty.charAt(0).toUpperCase() + pretty.slice(1);
-  const { parts, scene } = buildMystery(pretty);
+  const { parts, scene, mesh, material } = buildMystery(pretty);
   return {
     id: `mystery:${pretty.toLowerCase()}`,
     name: title,
@@ -93,6 +96,8 @@ export function mysteryConcept(word) {
     category: 'Mystery',
     mystery: true,
     scene,
+    mesh,
+    material,
     build: () => parts,
     facts: [
       `I do not know "${title}" yet, so I imagined a mystery friend for you!`,

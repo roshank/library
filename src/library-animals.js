@@ -1,15 +1,20 @@
 import { sphere, box, cone, cyl, torus, eyes, legs4, legs2, tail, neck, wing, bob, swing, spin, ground, lighten, belly as bellyPatch } from './builders.js';
 
-const savanna = { sky: ['#ffc46b', '#fff1d6'], ground: '#d9b86a' };
-const meadow = { sky: ['#8fd3ff', '#f1f8ff'], ground: '#8cd16a' };
-const ocean = { sky: ['#4aa3ff', '#cfe9ff'], ground: '#2f7fc2' };
-const ice = { sky: ['#a9d6ff', '#f4fbff'], ground: '#e8f4ff' };
-const home = { sky: ['#ffd6e7', '#fff6fa'], ground: '#c9a27a' };
+const savanna = { sky: ['#81c7ff', '#c9c1a8'], ground: '#d7b56e', groundType: 'sand', sun: [0.5, 0.45, 0.6], sunColor: '#ffd9a8', sunPower: 4.6, fog: 0.0001 };
+const meadow = { sky: ['#70c2ff', '#a3c3df'], ground: '#74a849', groundType: 'grass', sun: [0.4, 0.75, 0.5] };
+const ocean = { sky: ['#5aaeff', '#95bddf'], ground: '#2674a8', groundType: 'water', sun: [0.4, 0.7, 0.55] };
+const ice = { sky: ['#a3e0ff', '#c7dcea'], ground: '#e4edf5', groundType: 'snow', sun: [0.4, 0.5, 0.6], sunColor: '#fff4e4' };
+const home = { sky: ['#cde5ff', '#c9c4bd'], ground: '#a88664', groundType: 'rock', sun: [0.4, 0.75, 0.5] };
+const FUR = { skin: 'fur', pattern: 'mottle', rough: 0.78, sss: 0.4 };
+const HIDE = { skin: 'rough', pattern: 'mottle', rough: 0.72, sss: 0.3 };
+const SLEEK = { skin: 'smooth', pattern: 'mottle', rough: 0.3, sss: 0.3 };
+const jungle = { sky: ['#70c2ff', '#9cbdd9'], ground: '#5a8f3d', groundType: 'grass', sun: [0.4, 0.75, 0.5], fog: 0.0001 };
+const SHELL = { skin: 'scales', pattern: 'mottle', rough: 0.5, sss: 0.2 };
 
 function mammal({ color, belly, bodyScale, bodyY, legLen, thick, head, tailOpts, extras = () => [], pattern, color2, patternScale, legSpeed = 3, legColor }) {
   const parts = [];
   parts.push(sphere([0, bodyY, 0], bodyScale, color, { pattern, color2, patternScale, anim: [bob(0.03)] }));
-  if (belly) parts.push(bellyPatch([0, bodyY, 0], bodyScale, belly, { anim: [bob(0.03)] }));
+  if (belly) parts.push(bellyPatch([0, bodyY, 0], bodyScale, belly, { pattern, patternScale, anim: [bob(0.03)] }));
   parts.push(...legs4({ frontX: bodyScale[0] * 0.6, backX: -bodyScale[0] * 0.6, len: legLen, thick, color: legColor || color, spreadZ: bodyScale[2] * 0.5, speed: legSpeed, footColor: lighten(legColor || color, 0.1) }));
   parts.push(...head({ x: bodyScale[0] * 0.9, y: bodyY + bodyScale[1] * 0.4 }));
   if (tailOpts) parts.push(...tail({ start: [-bodyScale[0] * 0.9, bodyY + 0.2, 0], color, pattern, color2, patternScale, ...tailOpts }));
@@ -35,7 +40,7 @@ function catLike({ color, belly, color2, pattern, patternScale, mane, size = 1, 
       const out = [
         sphere([hx, hy, 0], [0.62 * S, 0.58 * S, 0.6 * S], color, { pattern, color2, patternScale, anim: a }),
         sphere([hx + 0.45 * S, hy - 0.15 * S, 0], [0.32 * S, 0.24 * S, 0.3 * S], snoutColor || lighten(color, 0.3), { anim: a }),
-        sphere([hx + 0.72 * S, hy - 0.08 * S, 0], 0.09 * S, '#3a2a2a', { anim: a }),
+        sphere([hx + 0.72 * S, hy - 0.08 * S, 0], 0.09 * S, '#473333', { anim: a }),
         ...ears(hx - 0.1 * S, hy + 0.5 * S, 0.38 * S, 0.3 * S, earColor || color, '#f3b5b5', 20),
         ...eyes([hx + 0.35 * S, hy + 0.12 * S, 0], 0.26 * S, 0.11 * S, { anim: a }),
       ];
@@ -51,8 +56,9 @@ export const ANIMALS = [
     id: 'elephant', name: 'Elephant', emoji: '🐘', category: 'Animals',
     aliases: ['elephant', 'elefant', 'elephants', 'elly'],
     scene: savanna,
+    material: HIDE,
     build: () => mammal({
-      color: '#9a9aa8', belly: '#bdbdc8', bodyScale: [2.0, 1.4, 1.35], bodyY: 2.2, legLen: 1.4, thick: 0.4,
+      color: '#9b9692', belly: '#aea8a3', bodyScale: [2.0, 1.4, 1.35], bodyY: 2.2, legLen: 1.4, thick: 0.4,
       head: ({ x, y }) => {
         const a = [bob(0.03, 2.4, 0.3)];
         const hx = x + 0.45, hy = y - 0.15;
@@ -60,12 +66,12 @@ export const ANIMALS = [
         const trunk = [];
         for (let i = 0; i < 6; i++) {
           const t = i / 5;
-          trunk.push(sphere([trunkPivot[0] + 0.25 + t * 0.35 - t * t * 0.4, trunkPivot[1] - t * 1.5, 0], [0.26 - t * 0.1, 0.3, 0.26 - t * 0.1], '#9a9aa8', { anim: [swing(trunkPivot, [0, 0, 1], 0.25 * (0.3 + t), 2, 0.5), ...a] }));
+          trunk.push(sphere([trunkPivot[0] + 0.25 + t * 0.35 - t * t * 0.4, trunkPivot[1] - t * 1.5, 0], [0.26 - t * 0.1, 0.3, 0.26 - t * 0.1], '#9b9692', { anim: [swing(trunkPivot, [0, 0, 1], 0.25 * (0.3 + t), 2, 0.5), ...a] }));
         }
         return [
-          sphere([hx, hy, 0], [0.95, 0.95, 0.9], '#9a9aa8', { anim: a }),
-          ...[-1, 1].map((s) => sphere([hx - 0.15, hy + 0.1, s * 0.95], [0.5, 0.9, 0.12], '#8f8f9d', { rot: [s * 10, 0, 0], anim: [swing([hx - 0.15, hy + 0.1, s * 0.55], [1, 0, 0], 0.15 * s, 1.5, s), ...a] })),
-          ...[-1, 1].map((s) => cone([hx + 0.7, hy - 0.45, s * 0.42], [0.09, 0.75, 0.09], '#fff4d6', { rot: [0, 0, -95], anim: a })),
+          sphere([hx, hy, 0], [0.95, 0.95, 0.9], '#9b9692', { anim: a }),
+          ...[-1, 1].map((s) => sphere([hx - 0.15, hy + 0.1, s * 0.95], [0.5, 0.9, 0.12], '#928c87', { rot: [s * 10, 0, 0], anim: [swing([hx - 0.15, hy + 0.1, s * 0.55], [1, 0, 0], 0.15 * s, 1.5, s), ...a] })),
+          ...[-1, 1].map((s) => cone([hx + 0.7, hy - 0.45, s * 0.42], [0.09, 0.75, 0.09], '#efe6cf', { hard: true, rough: 0.35, rot: [0, 0, -95], anim: a })),
           ...trunk,
           ...eyes([hx + 0.7, hy + 0.2, 0], 0.4, 0.12, { anim: a }),
         ];
@@ -88,10 +94,11 @@ export const ANIMALS = [
     id: 'giraffe', name: 'Giraffe', emoji: '🦒', category: 'Animals',
     aliases: ['giraffe', 'giraf', 'jiraffe', 'giraffes'],
     scene: savanna,
+    material: FUR,
     build: () => {
-      const color = '#e9b55a', spots = '#9a5f2a';
+      const color = '#ffd995', spots = '#985e2d';
       const parts = mammal({
-        color, color2: spots, pattern: 'spots', patternScale: 2.6, belly: '#f6dfae',
+        color, color2: spots, pattern: 'spots', patternScale: 2.6, belly: '#e8d7b5',
         bodyScale: [1.4, 0.95, 0.85], bodyY: 2.6, legLen: 2.1, thick: 0.2, legSpeed: 2,
         head: ({ x, y }) => {
           const n = neck({ start: [x - 0.3, y + 0.1, 0], len: 3.2, segs: 7, radius: 0.42, angle: 72, color, color2: spots, pattern: 'spots', patternScale: 2.6, taper: 0.25 });
@@ -99,10 +106,10 @@ export const ANIMALS = [
           const a = [bob(0.05, 2.4, 0.5)];
           return [...n.parts,
             sphere([hx + 0.3, hy + 0.15, 0], [0.62, 0.45, 0.42], color, { anim: a }),
-            sphere([hx + 0.75, hy + 0.05, 0], [0.32, 0.28, 0.32], '#f0d3a0', { anim: a }),
+            sphere([hx + 0.75, hy + 0.05, 0], [0.32, 0.28, 0.32], '#fae0b5', { anim: a }),
             ...[-1, 1].flatMap((s) => [
               cyl([hx + 0.15, hy + 0.6, s * 0.2], [0.05, 0.4, 0.05], color, { anim: a }),
-              sphere([hx + 0.15, hy + 0.82, s * 0.2], 0.1, '#6b3f1d', { anim: a }),
+              sphere([hx + 0.15, hy + 0.82, s * 0.2], 0.1, '#834d23', { anim: a }),
               sphere([hx - 0.05, hy + 0.45, s * 0.42], [0.1, 0.25, 0.08], color, { rot: [s * 40, 0, 0], anim: a }),
             ]),
             ...eyes([hx + 0.55, hy + 0.3, 0], 0.3, 0.1, { anim: a })];
@@ -127,7 +134,8 @@ export const ANIMALS = [
     id: 'lion', name: 'Lion', emoji: '🦁', category: 'Animals',
     aliases: ['lion', 'lions', 'lioness', 'king of the jungle'],
     scene: savanna,
-    build: () => catLike({ color: '#d9a44a', belly: '#f3dba8', mane: '#9a5a1e', size: 1.15 }),
+    material: FUR,
+    build: () => catLike({ color: '#f5c981', belly: '#fffdcb', mane: '#955c29', size: 1.15 }),
     facts: [
       'Lions are big cats. A daddy lion has a fluffy mane around his head.',
       'A lion\'s roar is so loud you can hear it from far, far away.',
@@ -143,8 +151,9 @@ export const ANIMALS = [
   {
     id: 'tiger', name: 'Tiger', emoji: '🐯', category: 'Animals',
     aliases: ['tiger', 'tigers', 'tigger'],
-    scene: { sky: ['#8fd3ff', '#f1f8ff'], ground: '#6fb85a' },
-    build: () => catLike({ color: '#f08a2a', belly: '#fbe8cf', color2: '#2a1a10', pattern: 'stripes', patternScale: 1.5, size: 1.15 }),
+    scene: { ...jungle },
+    material: FUR,
+    build: () => catLike({ color: '#ff9f39', belly: '#efe3cf', color2: '#332014', pattern: 'stripes', patternScale: 1.5, size: 1.15 }),
     facts: [
       'Tigers are the biggest cats in the world.',
       'Every tiger has its own pattern of stripes. No two tigers look exactly the same.',
@@ -161,18 +170,19 @@ export const ANIMALS = [
     id: 'zebra', name: 'Zebra', emoji: '🦓', category: 'Animals',
     aliases: ['zebra', 'zebras', 'stripy horse'],
     scene: savanna,
+    material: FUR,
     build: () => mammal({
-      color: '#f4f4f4', color2: '#1d1d22', pattern: 'stripes', patternScale: 2.2,
-      bodyScale: [1.5, 0.85, 0.75], bodyY: 1.7, legLen: 1.3, thick: 0.17, legColor: '#e9e9e9',
+      color: '#e4e2dc', color2: '#232329', pattern: 'stripes', patternScale: 2.2,
+      bodyScale: [1.5, 0.85, 0.75], bodyY: 1.7, legLen: 1.3, thick: 0.17, legColor: '#dddbd5',
       head: ({ x, y }) => {
-        const n = neck({ start: [x - 0.3, y, 0], len: 1.2, segs: 4, radius: 0.4, angle: 55, color: '#f4f4f4', color2: '#1d1d22', pattern: 'stripes', patternScale: 2.2, taper: 0.2 });
+        const n = neck({ start: [x - 0.3, y, 0], len: 1.2, segs: 4, radius: 0.4, angle: 55, color: '#e4e2dc', color2: '#232329', pattern: 'stripes', patternScale: 2.2, taper: 0.2 });
         const [hx, hy] = n.end;
         const a = [bob(0.05, 2.4, 0.5)];
         return [...n.parts,
-          sphere([hx + 0.35, hy + 0.1, 0], [0.7, 0.42, 0.4], '#f4f4f4', { color2: '#1d1d22', pattern: 'stripes', patternScale: 2.2, anim: a }),
-          sphere([hx + 0.85, hy, 0], [0.3, 0.28, 0.3], '#2a2a2e', { anim: a }),
-          ...[-1, 1].map((s) => sphere([hx + 0.05, hy + 0.45, s * 0.25], [0.12, 0.28, 0.1], '#f4f4f4', { anim: a })),
-          ...Array.from({ length: 5 }, (_, i) => sphere([n.parts[0].pos[0] - 0.1 + i * 0.22, n.parts[0].pos[1] + 0.35 + i * 0.3, 0], [0.15, 0.3, 0.08], '#1d1d22', { anim: a })),
+          sphere([hx + 0.35, hy + 0.1, 0], [0.7, 0.42, 0.4], '#e4e2dc', { color2: '#232329', pattern: 'stripes', patternScale: 2.2, anim: a }),
+          sphere([hx + 0.85, hy, 0], [0.3, 0.28, 0.3], '#333338', { anim: a }),
+          ...[-1, 1].map((s) => sphere([hx + 0.05, hy + 0.45, s * 0.25], [0.12, 0.28, 0.1], '#e4e2dc', { anim: a })),
+          ...Array.from({ length: 5 }, (_, i) => sphere([n.parts[0].pos[0] - 0.1 + i * 0.22, n.parts[0].pos[1] + 0.35 + i * 0.3, 0], [0.15, 0.3, 0.08], '#232329', { anim: a })),
           ...eyes([hx + 0.6, hy + 0.25, 0], 0.3, 0.1, { anim: a })];
       },
       tailOpts: { len: 1.1, segs: 4, radius: 0.08, angle: -55, wag: 0.5, speed: 3 },
@@ -193,8 +203,9 @@ export const ANIMALS = [
     id: 'shark', name: 'Shark', emoji: '🦈', category: 'Animals',
     aliases: ['shark', 'sharks', 'great white', 'great white shark', 'jaws'],
     scene: ocean,
+    material: SLEEK,
     build: () => {
-      const color = '#6f8fa8', belly = '#e6eef5';
+      const color = '#748798', belly = '#d8dde2';
       const parts = [];
       const y = 2.0;
       const a = [bob(0.08, 1.6)];
@@ -208,9 +219,9 @@ export const ANIMALS = [
       const wag = [swing(tp, [0, 1, 0], 0.35, 3.2), ...a];
       parts.push(cone([-2.4, y + 0.45, 0], [0.15, 1.1, 0.5], color, { rot: [0, 0, 30], anim: wag }));
       parts.push(cone([-2.35, y - 0.4, 0], [0.15, 0.8, 0.45], color, { rot: [0, 0, 180 - 30], anim: wag }));
-      parts.push(sphere([1.45, y - 0.28, 0], [0.62, 0.1, 0.42], '#2a2a35', { anim: a }));
+      parts.push(sphere([1.45, y - 0.28, 0], [0.62, 0.1, 0.42], '#333341', { anim: a }));
       for (let i = 0; i < 4; i++) for (const s of [-1, 1]) parts.push(cone([1.35 + i * 0.16, y - 0.2, s * (0.38 - i * 0.09)], [0.04, 0.12, 0.04], '#ffffff', { rot: [0, 0, 180], anim: a }));
-      for (let i = 0; i < 4; i++) parts.push(box([-0.2 - i * 0.18, y - 0.05, 0.6], [0.05, 0.25, 0.03], '#4e6a80', { anim: a }), box([-0.2 - i * 0.18, y - 0.05, -0.6], [0.05, 0.25, 0.03], '#4e6a80', { anim: a }));
+      for (let i = 0; i < 4; i++) parts.push(box([-0.2 - i * 0.18, y - 0.05, 0.6], [0.05, 0.25, 0.03], '#556470', { anim: a }), box([-0.2 - i * 0.18, y - 0.05, -0.6], [0.05, 0.25, 0.03], '#556470', { anim: a }));
       parts.push(...eyes([1.1, y + 0.2, 0], 0.45, 0.1, { anim: a }));
       return parts;
     },
@@ -230,8 +241,9 @@ export const ANIMALS = [
     id: 'whale', name: 'Blue Whale', emoji: '🐋', category: 'Animals',
     aliases: ['whale', 'blue whale', 'whales', 'wale', 'humpback'],
     scene: ocean,
+    material: SLEEK,
     build: () => {
-      const color = '#3f6fb5', belly = '#b7cde9';
+      const color = '#5a7495', belly = '#d4e0ef';
       const parts = [];
       const y = 2.0;
       const a = [bob(0.1, 1.4)];
@@ -246,7 +258,7 @@ export const ANIMALS = [
       for (let i = 0; i < 4; i++) parts.push(sphere([1.6, y + 1.1 + i * 0.3, (i % 2 ? 0.1 : -0.1) * i], [0.12 + i * 0.05, 0.25, 0.12 + i * 0.05], '#dff3ff', { alpha: 0.75, anim: [bob(0.15, 2.4, i)] }));
       parts.push(cyl([-0.1, y + 0.6, 0], [0.8, 0.8, 0.3], color, { rot: [0, 0, 0], anim: a }));
       parts.push(...eyes([2.4, y + 0.1, 0], 0.72, 0.12, { anim: a }));
-      parts.push(box([2.95, y - 0.35, 0], [0.5, 0.06, 0.6], '#2d4f85', { anim: a }));
+      parts.push(box([2.95, y - 0.35, 0], [0.5, 0.06, 0.6], '#34475a', { anim: a }));
       return parts;
     },
     facts: [
@@ -265,8 +277,9 @@ export const ANIMALS = [
     id: 'dolphin', name: 'Dolphin', emoji: '🐬', category: 'Animals',
     aliases: ['dolphin', 'dolphins', 'dolfin', 'porpoise'],
     scene: ocean,
+    material: SLEEK,
     build: () => {
-      const color = '#6aa9d8', belly = '#e3f1fb';
+      const color = '#95abbc', belly = '#dfe6ea';
       const parts = [];
       const y = 2.0;
       const a = [bob(0.12, 2)];
@@ -297,13 +310,14 @@ export const ANIMALS = [
   {
     id: 'octopus', name: 'Octopus', emoji: '🐙', category: 'Animals',
     aliases: ['octopus', 'octopuses', 'octopi', 'octapus'],
-    scene: { sky: ['#3d7bd6', '#9ad0ff'], ground: '#e5c98f' },
+    scene: { sky: ['#4a96ff', '#9ad0ff'], ground: '#f5d99a', groundType: 'sand', sun: [0.3, 0.8, 0.5], fog: 0.001 },
+    material: { skin: 'smooth', pattern: 'mottle', rough: 0.35, sss: 0.5 },
     build: () => {
-      const color = '#c75fa5', pale = '#f1bfe0';
+      const color = '#bc6e5a', pale = '#ffdac2';
       const parts = [];
       const y = 1.6;
       const a = [bob(0.06, 1.8)];
-      parts.push(sphere([0, y + 0.3, 0], [1.1, 1.2, 1.1], color, { pattern: 'spots', color2: '#a3407f', patternScale: 3, anim: a }));
+      parts.push(sphere([0, y + 0.3, 0], [1.1, 1.2, 1.1], color, { pattern: 'spots', color2: '#8c4e39', patternScale: 3, anim: a }));
       for (let i = 0; i < 8; i++) {
         const ang = (i / 8) * Math.PI * 2 + 0.2;
         const dx = Math.cos(ang), dz = Math.sin(ang);
@@ -335,18 +349,19 @@ export const ANIMALS = [
     id: 'penguin', name: 'Penguin', emoji: '🐧', category: 'Animals',
     aliases: ['penguin', 'penguins', 'pengwin', 'emperor penguin'],
     scene: ice,
+    material: { skin: 'fur', rough: 0.6, sss: 0.2 },
     build: () => {
       const parts = [];
       const a = [swing([0, 0, 0], [1, 0, 0], 0.12, 3)];
-      parts.push(sphere([0, 1.3, 0], [0.9, 1.25, 0.95], '#23283a', { anim: a }));
+      parts.push(sphere([0, 1.3, 0], [0.9, 1.25, 0.95], '#2b3147', { anim: a }));
       parts.push(sphere([0.35, 1.15, 0], [0.62, 1.0, 0.72], '#fbfbfb', { anim: a }));
-      parts.push(sphere([0.1, 2.55, 0], [0.62, 0.6, 0.62], '#23283a', { anim: a }));
+      parts.push(sphere([0.1, 2.55, 0], [0.62, 0.6, 0.62], '#2b3147', { anim: a }));
       parts.push(sphere([0.45, 2.5, 0], [0.32, 0.4, 0.44], '#fbfbfb', { anim: a }));
-      parts.push(cone([0.75, 2.42, 0], [0.12, 0.45, 0.12], '#f5a623', { rot: [0, 0, -95], anim: a }));
+      parts.push(cone([0.75, 2.42, 0], [0.12, 0.45, 0.12], '#ffcb2b', { rot: [0, 0, -95], anim: a }));
       parts.push(...eyes([0.55, 2.7, 0], 0.26, 0.09, { anim: a }));
       for (const s of [-1, 1]) {
-        parts.push(sphere([0, 1.4, s * 0.85], [0.35, 0.8, 0.12], '#23283a', { rot: [s * 15, 0, 0], anim: [swing([0, 1.9, s * 0.8], [1, 0, 0], 0.4 * s, 3), ...a] }));
-        parts.push(sphere([0.3, 0.1, s * 0.35], [0.45, 0.12, 0.3], '#f5a623', { anim: [bob(0.08, 3, s > 0 ? 0 : Math.PI)] }));
+        parts.push(sphere([0, 1.4, s * 0.85], [0.35, 0.8, 0.12], '#2b3147', { rot: [s * 15, 0, 0], anim: [swing([0, 1.9, s * 0.8], [1, 0, 0], 0.4 * s, 3), ...a] }));
+        parts.push(sphere([0.3, 0.1, s * 0.35], [0.45, 0.12, 0.3], '#ffcb2b', { anim: [bob(0.08, 3, s > 0 ? 0 : Math.PI)] }));
       }
       return ground(parts);
     },
@@ -365,19 +380,20 @@ export const ANIMALS = [
   {
     id: 'frog', name: 'Frog', emoji: '🐸', category: 'Animals',
     aliases: ['frog', 'frogs', 'toad', 'froggy'],
-    scene: { sky: ['#8fd3ff', '#f1f8ff'], ground: '#5fb04d' },
+    scene: { ...meadow, ground: '#60953e' },
+    material: { skin: 'smooth', pattern: 'mottle', rough: 0.22, sss: 0.5 },
     build: () => {
-      const g = '#58c04a', light = '#b7ec9d';
+      const g = '#73ae47', light = '#dffda8';
       const parts = [];
       const a = [bob(0.03, 2.4)];
       parts.push(sphere([0, 0.75, 0], [1.1, 0.7, 0.95], g, { anim: a }));
       parts.push(sphere([0.15, 0.55, 0], [0.9, 0.5, 0.8], light, { anim: a }));
       parts.push(sphere([0.6, 1.05, 0], [0.75, 0.5, 0.9], g, { anim: a }));
-      parts.push(box([1.0, 0.85, 0], [0.9, 0.05, 1.1], '#2e6b2a', { anim: a }));
+      parts.push(box([1.0, 0.85, 0], [0.9, 0.05, 1.1], '#345a2c', { anim: a }));
       for (const s of [-1, 1]) {
         parts.push(sphere([0.8, 1.5, s * 0.55], 0.3, g, { anim: a }));
         parts.push(sphere([0.95, 1.55, s * 0.55], 0.22, '#ffffff', { anim: a, shiny: 60 }));
-        parts.push(sphere([1.1, 1.58, s * 0.55], 0.12, '#1b1b2f', { anim: a, shiny: 90 }));
+        parts.push(sphere([1.1, 1.58, s * 0.55], 0.12, '#212139', { anim: a, shiny: 90 }));
         parts.push(sphere([-0.6, 0.6, s * 1.0], [0.55, 0.45, 0.4], g, { anim: a }));
         parts.push(sphere([-0.2, 0.15, s * 1.15], [0.6, 0.15, 0.35], g, { anim: a }));
         parts.push(sphere([0.9, 0.2, s * 0.8], [0.5, 0.15, 0.3], g, { anim: a }));
@@ -402,18 +418,19 @@ export const ANIMALS = [
     id: 'butterfly', name: 'Butterfly', emoji: '🦋', category: 'Animals',
     aliases: ['butterfly', 'butterflies', 'buterfly', 'monarch'],
     scene: meadow,
+    material: { skin: 'fur', rough: 0.7, sss: 0.2 },
     build: () => {
       const parts = [];
       const y = 2.2;
       const a = [bob(0.15, 2.5)];
-      parts.push(sphere([0, y, 0], [0.75, 0.18, 0.18], '#2c2c3a', { anim: a }));
-      parts.push(sphere([0.75, y + 0.05, 0], 0.22, '#2c2c3a', { anim: a }));
+      parts.push(sphere([0, y, 0], [0.75, 0.18, 0.18], '#363647', { anim: a }));
+      parts.push(sphere([0.75, y + 0.05, 0], 0.22, '#363647', { anim: a }));
       for (const s of [-1, 1]) {
-        parts.push(cyl([0.95, y + 0.4, s * 0.12], [0.02, 0.5, 0.02], '#2c2c3a', { rot: [s * 25, 0, -30], anim: a }));
+        parts.push(cyl([0.95, y + 0.4, s * 0.12], [0.02, 0.5, 0.02], '#363647', { rot: [s * 25, 0, -30], anim: a }));
         const flap = [swing([0, y, 0], [1, 0, 0], 0.9 * s, 5), ...a];
-        parts.push(sphere([0.25, y, s * 0.95], [0.75, 0.04, 0.95], '#f2994a', { pattern: 'spots', color2: '#1d1d22', patternScale: 4, anim: flap }));
-        parts.push(sphere([-0.55, y, s * 0.7], [0.55, 0.04, 0.65], '#f2b84a', { pattern: 'spots', color2: '#1d1d22', patternScale: 4, anim: flap }));
-        parts.push(torus([0.25, y, s * 0.95], [0.8, 0.5, 0.95], '#1d1d22', { rot: [0, 0, 0], anim: flap }));
+        parts.push(sphere([0.25, y, s * 0.95], [0.75, 0.04, 0.95], '#ffbb5a', { pattern: 'spots', color2: '#232329', patternScale: 4, anim: flap }));
+        parts.push(sphere([-0.55, y, s * 0.7], [0.55, 0.04, 0.65], '#ffe05a', { pattern: 'spots', color2: '#232329', patternScale: 4, anim: flap }));
+        parts.push(torus([0.25, y, s * 0.95], [0.8, 0.5, 0.95], '#232329', { rot: [0, 0, 0], anim: flap }));
       }
       parts.push(...eyes([0.9, y + 0.1, 0], 0.15, 0.06, { anim: a }));
       return parts;
@@ -433,13 +450,14 @@ export const ANIMALS = [
   {
     id: 'turtle', name: 'Sea Turtle', emoji: '🐢', category: 'Animals',
     aliases: ['turtle', 'sea turtle', 'turtles', 'tortoise', 'turtel'],
-    scene: { sky: ['#4aa3ff', '#cfe9ff'], ground: '#e5c98f' },
+    scene: { sky: ['#4a96ff', '#9ad0ff'], ground: '#f5d99a', groundType: 'sand', sun: [0.3, 0.8, 0.5], fog: 0.001 },
+    material: SHELL,
     build: () => {
-      const shell = '#3f8a5a', skin = '#8cc37a';
+      const shell = '#6e834d', skin = '#a8bc81';
       const parts = [];
       const a = [bob(0.04, 1.8)];
-      parts.push(sphere([0, 0.9, 0], [1.5, 0.7, 1.25], shell, { pattern: 'spots', color2: '#2f6a44', patternScale: 2.2, anim: a }));
-      parts.push(sphere([0, 0.55, 0], [1.4, 0.3, 1.15], '#d8c58a', { anim: a }));
+      parts.push(sphere([0, 0.9, 0], [1.5, 0.7, 1.25], shell, { pattern: 'spots', color2: '#4a5a33', patternScale: 2.2, anim: a }));
+      parts.push(sphere([0, 0.55, 0], [1.4, 0.3, 1.15], '#eddca8', { anim: a }));
       parts.push(sphere([1.7, 0.85, 0], [0.5, 0.38, 0.38], skin, { anim: a }));
       parts.push(...eyes([1.95, 1.0, 0], 0.25, 0.09, { anim: a }));
       for (const s of [-1, 1]) {
@@ -465,17 +483,18 @@ export const ANIMALS = [
     id: 'bee', name: 'Honey Bee', emoji: '🐝', category: 'Animals',
     aliases: ['bee', 'bees', 'honey bee', 'honeybee', 'bumblebee', 'bumble bee'],
     scene: meadow,
+    material: { skin: 'fur', rough: 0.6, sss: 0.2 },
     build: () => {
       const parts = [];
       const y = 2.0;
       const a = [bob(0.15, 3)];
-      parts.push(sphere([-0.2, y, 0], [1.0, 0.7, 0.7], '#f5c026', { pattern: 'stripes', color2: '#2a2520', patternScale: 1.6, anim: a }));
-      parts.push(sphere([0.9, y + 0.1, 0], [0.5, 0.5, 0.5], '#2a2520', { anim: a }));
-      parts.push(cone([-1.3, y - 0.05, 0], [0.12, 0.35, 0.12], '#2a2520', { rot: [0, 0, 90], anim: a }));
+      parts.push(sphere([-0.2, y, 0], [1.0, 0.7, 0.7], '#ffea2e', { pattern: 'stripes', color2: '#332d27', patternScale: 1.6, anim: a }));
+      parts.push(sphere([0.9, y + 0.1, 0], [0.5, 0.5, 0.5], '#332d27', { anim: a }));
+      parts.push(cone([-1.3, y - 0.05, 0], [0.12, 0.35, 0.12], '#332d27', { rot: [0, 0, 90], anim: a }));
       for (const s of [-1, 1]) {
-        parts.push(cyl([1.1, y + 0.55, s * 0.18], [0.03, 0.45, 0.03], '#2a2520', { rot: [s * 20, 0, -25], anim: a }));
+        parts.push(cyl([1.1, y + 0.55, s * 0.18], [0.03, 0.45, 0.03], '#332d27', { rot: [s * 20, 0, -25], anim: a }));
         parts.push(sphere([0.0, y + 0.55, s * 0.7], [0.6, 0.03, 0.75], '#dff4ff', { alpha: 0.65, anim: [swing([0, y + 0.4, 0], [1, 0, 0], 0.5 * s, 18), ...a] }));
-        for (let i = 0; i < 3; i++) parts.push(cyl([0.4 - i * 0.4, y - 0.6, s * 0.45], [0.04, 0.4, 0.04], '#2a2520', { rot: [s * 25, 0, 0], anim: a }));
+        for (let i = 0; i < 3; i++) parts.push(cyl([0.4 - i * 0.4, y - 0.6, s * 0.45], [0.04, 0.4, 0.04], '#332d27', { rot: [s * 25, 0, 0], anim: a }));
       }
       parts.push(...eyes([1.2, y + 0.2, 0], 0.3, 0.14, { anim: a, pupil: '#111' }));
       return parts;
@@ -496,7 +515,8 @@ export const ANIMALS = [
     id: 'cat', name: 'Cat', emoji: '🐱', category: 'Animals',
     aliases: ['cat', 'cats', 'kitty', 'kitten', 'kitty cat'],
     scene: home,
-    build: () => catLike({ color: '#8e8e9a', belly: '#e8e8ee', color2: '#5a5a66', pattern: 'stripes', patternScale: 2.2, size: 0.85, snoutColor: '#f0d9d9' }),
+    material: FUR,
+    build: () => catLike({ color: '#a8a29c', belly: '#d9d4ce', color2: '#68625a', pattern: 'stripes', patternScale: 2.2, size: 0.85, snoutColor: '#d8c4bf' }),
     facts: [
       'Cats purr when they are happy. It sounds like a little motor!',
       'Cats can see really well in the dark, much better than people.',
@@ -513,8 +533,9 @@ export const ANIMALS = [
     id: 'dog', name: 'Dog', emoji: '🐶', category: 'Animals',
     aliases: ['dog', 'dogs', 'puppy', 'doggy', 'doggie', 'pup'],
     scene: meadow,
+    material: FUR,
     build: () => {
-      const color = '#c98a4b', belly = '#f3dcbb';
+      const color = '#da9c60', belly = '#e2cfb0';
       return mammal({
         color, belly, bodyScale: [1.4, 0.75, 0.7], bodyY: 1.2, legLen: 0.8, thick: 0.18,
         head: ({ x, y }) => {
@@ -523,14 +544,14 @@ export const ANIMALS = [
           return [
             sphere([hx, hy, 0], [0.6, 0.58, 0.58], color, { anim: a }),
             sphere([hx + 0.5, hy - 0.15, 0], [0.4, 0.28, 0.32], belly, { anim: a }),
-            sphere([hx + 0.85, hy - 0.1, 0], 0.11, '#2a2a2a', { anim: a }),
-            cyl([hx + 0.55, hy - 0.42, 0.1], [0.12, 0.2, 0.08], '#ec7f8f', { rot: [20, 0, 0], anim: a }),
-            ...[-1, 1].map((s) => sphere([hx - 0.1, hy + 0.25, s * 0.5], [0.3, 0.5, 0.12], '#8a5a2b', { rot: [s * 30, 0, 0], anim: [swing([hx - 0.1, hy + 0.5, s * 0.4], [1, 0, 0], 0.15 * s, 3), ...a] })),
+            sphere([hx + 0.85, hy - 0.1, 0], 0.11, '#333333', { anim: a }),
+            cyl([hx + 0.55, hy - 0.42, 0.1], [0.12, 0.2, 0.08], '#ff9bae', { rot: [20, 0, 0], anim: a }),
+            ...[-1, 1].map((s) => sphere([hx - 0.1, hy + 0.25, s * 0.5], [0.3, 0.5, 0.12], '#95643b', { rot: [s * 30, 0, 0], anim: [swing([hx - 0.1, hy + 0.5, s * 0.4], [1, 0, 0], 0.15 * s, 3), ...a] })),
             ...eyes([hx + 0.35, hy + 0.15, 0], 0.26, 0.11, { anim: a }),
           ];
         },
         tailOpts: { len: 1.0, segs: 5, radius: 0.12, angle: 50, curl: 0.3, wag: 0.8, speed: 7 },
-        extras: () => [torus([0.95, 1.4, 0], [0.42, 0.42, 0.42], '#e0453a', { rot: [0, 0, 90], anim: [bob(0.03)] })],
+        extras: () => [torus([0.95, 1.4, 0], [0.42, 0.42, 0.42], '#ff5447', { rot: [0, 0, 90], anim: [bob(0.03)] })],
       });
     },
     facts: [

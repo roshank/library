@@ -1,6 +1,7 @@
 import { sphere, box, cone, cyl, torus, eyes, bob, swing, spin, ground, lighten } from './builders.js';
 
-const space = { sky: ['#05071a', '#1b1f4a'], ground: '#000', space: true };
+const space = { sky: ['#02030a', '#0a0e22'], ground: '#000', space: true, sun: [0.6, 0.3, 0.55], sunColor: '#fff8f0', sunPower: 3.6, fog: 0 };
+const GRASS = { sky: ['#5c9fe0', '#a3c3df'], ground: '#5f8a3c', groundType: 'grass', sun: [0.4, 0.75, 0.5] };
 
 function stars(seed = 7) {
   let s = seed;
@@ -16,9 +17,8 @@ function stars(seed = 7) {
 
 function planet({ color, color2, pattern, patternScale = 1.8, radius = 2.4, spinSpeed = 0.25, extras = [] }) {
   return [
-    sphere([0, 2.5, 0], radius, color, { color2, pattern, patternScale, anim: [spin([0.15, 1, 0], spinSpeed, [0, 2.5, 0])] }),
+    sphere([0, 2.5, 0], radius, color, { color2, pattern, patternScale, rough: 0.85, anim: [spin([0.15, 1, 0], spinSpeed, [0, 2.5, 0])] }),
     ...extras,
-    ...stars(),
   ];
 }
 
@@ -28,10 +28,10 @@ export const WORLD = [
     aliases: ['earth', 'planet earth', 'the earth', 'our planet', 'world', 'the world'],
     scene: space,
     build: () => planet({
-      color: '#2d6fd6', color2: '#4caf50', pattern: 'blobs', patternScale: 1.1,
+      color: '#1d4f9c', color2: '#3f7a3a', pattern: 'blobs', patternScale: 1.1,
       extras: [
         sphere([0, 2.5, 0], 2.48, '#ffffff', { pattern: 'clouds', patternScale: 1.6, alpha: 0.85, anim: [spin([0.15, 1, 0], 0.32, [0, 2.5, 0])] }),
-        sphere([0, 2.5, 0], 2.62, '#8fd3ff', { alpha: 0.12, emissive: true, color2: '#8fd3ff' }),
+        sphere([0, 2.5, 0], 2.62, '#6fb6ff', { alpha: 0.1, emissive: true, color2: '#6fb6ff' }),
         sphere([5.2, 3.6, 0], 0.55, '#cfcfd6', { fit: false, pattern: 'blobs', color2: '#9a9aa5', patternScale: 4, anim: [{ type: 'orbit', center: [0, 2.5, 0], speed: 0.4 }] }),
       ],
     }),
@@ -67,13 +67,12 @@ export const WORLD = [
   {
     id: 'sun', name: 'The Sun', emoji: '☀️', category: 'Space',
     aliases: ['sun', 'the sun', 'our star', 'sunshine'],
-    scene: { sky: ['#1a0c2e', '#4a1c3a'], ground: '#000', space: true },
+    scene: { ...space, sky: ['#120818', '#3a1a2e'] },
     build: () => [
       sphere([0, 2.5, 0], 2.4, '#ffb000', { color2: '#ff4d00', pattern: 'fiery', patternScale: 1.2, emissive: true, anim: [spin([0, 1, 0], 0.1, [0, 2.5, 0])] }),
       sphere([0, 2.5, 0], 2.9, '#ffd36b', { alpha: 0.22, emissive: true, color2: '#ffd36b' }),
       sphere([0, 2.5, 0], 3.6, '#ff9f43', { alpha: 0.1, emissive: true, color2: '#ff9f43' }),
       ...Array.from({ length: 10 }, (_, i) => cone([Math.cos((i / 10) * Math.PI * 2) * 3.1, 2.5 + Math.sin((i / 10) * Math.PI * 2) * 3.1, 0], [0.25, 0.9, 0.25], '#ffd36b', { emissive: true, color2: '#ffd36b', alpha: 0.6, rot: [0, 0, (i / 10) * 360 - 90], anim: [spin([0, 0, 1], 0.2, [0, 2.5, 0])] })),
-      ...stars(3),
     ],
     facts: [
       'The Sun is a star, just like the twinkly stars at night, but it is much, much closer to us.',
@@ -148,12 +147,12 @@ export const WORLD = [
   {
     id: 'rocket', name: 'Rocket', emoji: '🚀', category: 'Machines',
     aliases: ['rocket', 'rockets', 'rocket ship', 'rocketship', 'spaceship', 'space ship'],
-    scene: { sky: ['#1c2a6b', '#6c9ad8'], ground: '#8a8f9a' },
+    scene: { sky: ['#2a4a8a', '#7fa0c8'], ground: '#7a7d80', groundType: 'asphalt', sun: [0.5, 0.6, 0.6] },
     build: () => {
       const parts = [];
       const a = [bob(0.03, 9)];
-      parts.push(cyl([0, 2.6, 0], [0.9, 3.2, 0.9], '#f4f4f8', { anim: a }));
-      parts.push(cone([0, 4.9, 0], [0.9, 1.4, 0.9], '#e63946', { anim: a }));
+      parts.push(cyl([0, 2.6, 0], [0.9, 3.2, 0.9], '#e8e8ea', { anim: a, rough: 0.35, metal: 0.6 }));
+      parts.push(cone([0, 4.9, 0], [0.9, 1.4, 0.9], '#c8343f', { anim: a, rough: 0.4, metal: 0.3 }));
       parts.push(torus([0, 3.1, 0], [0.92, 0.1, 0.92], '#1d3557', { anim: a }));
       parts.push(torus([0, 3.1, 0.8], [0.35, 0.3, 0.35], '#1d3557', { rot: [90, 0, 0], anim: a }));
       parts.push(sphere([0, 3.1, 0.85], 0.3, '#8fd3ff', { shiny: 80, anim: a }));
@@ -187,13 +186,13 @@ export const WORLD = [
   {
     id: 'car', name: 'Car', emoji: '🚗', category: 'Machines',
     aliases: ['car', 'cars', 'race car', 'racecar', 'automobile', 'vroom'],
-    scene: { sky: ['#8fd3ff', '#f1f8ff'], ground: '#9a9aa0' },
+    scene: { sky: ['#4f8fd6', '#a3c3df'], ground: '#45474b', groundType: 'asphalt', sun: [0.5, 0.65, 0.55] },
     build: () => {
       const parts = [];
       const red = '#e63946';
-      parts.push(box([0, 0.95, 0], [3.2, 0.7, 1.6], red));
-      parts.push(box([-0.2, 1.55, 0], [1.9, 0.6, 1.4], red));
-      parts.push(box([-0.2, 1.55, 0], [1.6, 0.45, 1.45], '#8fd3ff', { shiny: 80 }));
+      parts.push(box([0, 0.95, 0], [3.2, 0.7, 1.6], red, { rough: 0.25, metal: 0.4 }));
+      parts.push(box([-0.2, 1.55, 0], [1.9, 0.6, 1.4], red, { rough: 0.25, metal: 0.4 }));
+      parts.push(box([-0.2, 1.55, 0], [1.6, 0.45, 1.45], '#6fa8d8', { rough: 0.05, metal: 0.2 }));
       for (const [x, z] of [[1.0, 0.85], [1.0, -0.85], [-1.0, 0.85], [-1.0, -0.85]]) {
         parts.push(cyl([x, 0.45, z], [0.45, 0.3, 0.45], '#2b2b30', { rot: [90, 0, 0], anim: [spin([0, 0, 1], -6, [x, 0.45, z])] }));
         parts.push(cyl([x, 0.45, z], [0.25, 0.32, 0.25], '#d9d9df', { rot: [90, 0, 0], anim: [spin([0, 0, 1], -6, [x, 0.45, z])] }));
@@ -220,12 +219,12 @@ export const WORLD = [
   {
     id: 'airplane', name: 'Airplane', emoji: '✈️', category: 'Machines',
     aliases: ['airplane', 'aeroplane', 'plane', 'planes', 'jet', 'aircraft'],
-    scene: { sky: ['#4aa3ff', '#dff0ff'], ground: '#8cc77a' },
+    scene: { sky: ['#3f86d8', '#9fc3e4'], ground: '#5f8a3c', groundType: 'grass', sun: [0.4, 0.75, 0.5], fog: 0.0002 },
     build: () => {
       const parts = [];
       const y = 3.0;
       const a = [bob(0.08, 1.5), swing([0, y, 0], [1, 0, 0], 0.05, 1.1)];
-      parts.push(cyl([0, y, 0], [0.55, 4.2, 0.55], '#f4f4f8', { rot: [0, 0, 90], anim: a }));
+      parts.push(cyl([0, y, 0], [0.55, 4.2, 0.55], '#e6e7ea', { rot: [0, 0, 90], anim: a, rough: 0.3, metal: 0.5 }));
       parts.push(sphere([2.2, y, 0], [0.7, 0.55, 0.55], '#f4f4f8', { anim: a }));
       parts.push(cone([-2.3, y + 0.1, 0], [0.55, 0.9, 0.55], '#f4f4f8', { rot: [0, 0, 90], anim: a }));
       parts.push(box([0.2, y, 0], [1.1, 0.08, 5.5], '#3a86ff', { anim: a }));
@@ -256,19 +255,20 @@ export const WORLD = [
     ],
   },
   {
-    id: 'volcano', name: 'Volcano', emoji: '🌋', category: 'Nature',
+    id: 'volcano', name: 'Volcano', emoji: '🌋', category: 'Nature', mesh: 'organic', material: { skin: 'rough', pattern: 'mottle', rough: 0.9, sss: 0.0 },
     aliases: ['volcano', 'volcanoes', 'volcanos', 'lava', 'vulcano'],
-    scene: { sky: ['#2b1b2f', '#b84a2b'], ground: '#4a3a33' },
+    scene: { sky: ['#3a2a2a', '#a35a3a'], ground: '#3b332f', groundType: 'rock', sun: [-0.3, 0.35, 0.6], sunColor: '#ffb080', sunPower: 2.6, fog: 0.0002 },
     build: () => {
       const parts = [];
-      parts.push(cone([0, 1.6, 0], [3.2, 3.2, 3.2], '#5c4a40'));
-      parts.push(cyl([0, 3.0, 0], [0.9, 0.6, 0.9], '#3a2f2a'));
-      parts.push(cyl([0, 3.3, 0], [0.7, 0.1, 0.7], '#ff6a00', { emissive: true, color2: '#ffd166' }));
+      parts.push(cone([0, 1.6, 0], [3.2, 3.2, 3.2], '#4a3b33', { blend: 0.5 }));
+      for (let i = 0; i < 7; i++) parts.push(sphere([Math.cos(i * 0.9) * (1.2 + i * 0.12), 0.5 + (i % 3) * 0.3, Math.sin(i * 0.9) * (1.2 + i * 0.12)], [0.9, 0.6, 0.8], '#4a3b33', { blend: 0.5 }));
+      parts.push(cyl([0, 3.0, 0], [0.9, 0.6, 0.9], '#302622', { blend: 0.3 }));
+      parts.push(cyl([0, 3.3, 0], [0.7, 0.1, 0.7], '#ff6a00', { hard: true, emissive: true, color2: '#ffd166' }));
       // lava streams
       for (const ang of [0.4, 2.2, 4.1]) {
         for (let i = 0; i < 4; i++) {
           const t = (i + 0.5) / 4;
-          parts.push(sphere([Math.cos(ang) * (0.8 + t * 2.0), 3.0 - t * 2.6, Math.sin(ang) * (0.8 + t * 2.0)], [0.3, 0.12, 0.3], '#ff5400', { emissive: true, color2: '#ffd166' }));
+          parts.push(sphere([Math.cos(ang) * (0.8 + t * 2.0), 3.0 - t * 2.6, Math.sin(ang) * (0.8 + t * 2.0)], [0.3, 0.12, 0.3], '#ff5400', { hard: true, emissive: true, color2: '#ffd166' }));
         }
       }
       // smoke & embers
@@ -289,19 +289,19 @@ export const WORLD = [
     ],
   },
   {
-    id: 'tree', name: 'Tree', emoji: '🌳', category: 'Nature',
+    id: 'tree', name: 'Tree', emoji: '🌳', category: 'Nature', mesh: 'organic', material: { skin: 'rough', pattern: 'mottle', rough: 0.85, sss: 0.15 },
     aliases: ['tree', 'trees', 'oak', 'oak tree', 'forest'],
-    scene: { sky: ['#8fd3ff', '#f1f8ff'], ground: '#7fc45f' },
+    scene: GRASS,
     build: () => {
       const parts = [];
       const a = [swing([0, 0, 0], [0, 0, 1], 0.02, 1.2)];
-      parts.push(cyl([0, 1.5, 0], [0.55, 3.0, 0.55], '#8b5a2b', { anim: a }));
+      parts.push(cyl([0, 1.5, 0], [0.55, 3.0, 0.55], '#5e4228', { anim: a }));
       parts.push(cyl([0.5, 2.6, 0.2], [0.22, 1.4, 0.22], '#8b5a2b', { rot: [10, 0, -35], anim: a }));
       parts.push(cyl([-0.5, 2.7, -0.2], [0.2, 1.3, 0.2], '#8b5a2b', { rot: [-10, 0, 35], anim: a }));
-      const greens = ['#3f9f3a', '#56b848', '#2f8a2f'];
+      const greens = ['#3a6f2e', '#4a8a3a', '#2f5f28'];
       const blobs = [[0, 4.4, 0, 1.7], [1.1, 3.9, 0.4, 1.2], [-1.1, 3.9, -0.3, 1.2], [0.2, 3.7, 1.1, 1.0], [-0.3, 3.8, -1.1, 1.0], [0.3, 5.3, 0.2, 1.1]];
       blobs.forEach(([x, y, z, s], i) => parts.push(sphere([x, y, z], s, greens[i % 3], { anim: [swing([0, 0, 0], [0, 0, 1], 0.03, 1.2, i)] })));
-      for (let i = 0; i < 6; i++) parts.push(sphere([Math.cos(i * 1.1) * 1.3, 4.2 + Math.sin(i * 2.1) * 0.8, Math.sin(i * 1.1) * 1.3], 0.14, '#e63946', { anim: a }));
+      for (let i = 0; i < 6; i++) parts.push(sphere([Math.cos(i * 1.1) * 1.3, 4.2 + Math.sin(i * 2.1) * 0.8, Math.sin(i * 1.1) * 1.3], 0.14, '#b8303a', { hard: true, rough: 0.3, anim: a }));
       return parts;
     },
     facts: [
@@ -317,24 +317,24 @@ export const WORLD = [
     ],
   },
   {
-    id: 'snowman', name: 'Snowman', emoji: '⛄', category: 'Nature',
+    id: 'snowman', name: 'Snowman', emoji: '⛄', category: 'Nature', mesh: 'organic', material: { skin: 'rough', rough: 0.7, sss: 0.4 },
     aliases: ['snowman', 'snow man', 'snow', 'frosty', 'snowmen'],
-    scene: { sky: ['#a9d6ff', '#f4fbff'], ground: '#eef6ff' },
+    scene: { sky: ['#86b8e8', '#eef6fb'], ground: '#eef3f8', groundType: 'snow', sun: [0.4, 0.5, 0.6], sunColor: '#fff4e4' },
     build: () => {
       const parts = [];
       const a = [swing([0, 0, 0], [1, 0, 0], 0.04, 1.5)];
       parts.push(sphere([0, 1.1, 0], 1.15, '#ffffff', { anim: a }));
       parts.push(sphere([0, 2.75, 0], 0.85, '#ffffff', { anim: a }));
       parts.push(sphere([0, 3.95, 0], 0.62, '#ffffff', { anim: a }));
-      parts.push(cone([0.65, 3.95, 0], [0.1, 0.6, 0.1], '#ff7b00', { rot: [0, 0, -90], anim: a }));
+      parts.push(cone([0.65, 3.95, 0], [0.1, 0.6, 0.1], '#e0661a', { hard: true, rough: 0.5, rot: [0, 0, -90], anim: a }));
       parts.push(...eyes([0.5, 4.15, 0], 0.22, 0.08, { white: '#222', pupil: '#222', anim: a }));
-      for (let i = 0; i < 3; i++) parts.push(sphere([0.8 - i * 0.03, 3.0 - i * 0.35, 0], 0.08, '#222', { anim: a }));
-      for (let i = 0; i < 4; i++) parts.push(sphere([0.58 + Math.cos(i * 0.6) * 0.05, 3.7, (i - 1.5) * 0.14], 0.045, '#222', { anim: a }));
-      parts.push(cyl([0, 4.55, 0], [0.7, 0.1, 0.7], '#222', { anim: a }));
-      parts.push(cyl([0, 4.95, 0], [0.45, 0.75, 0.45], '#222', { anim: a }));
-      parts.push(torus([0, 3.5, 0], [0.75, 0.15, 0.75], '#e63946', { anim: a }));
-      parts.push(box([0.6, 3.1, 0.3], [0.35, 0.8, 0.35], '#e63946', { rot: [0, 0, 10], anim: a }));
-      for (const s of [-1, 1]) parts.push(cyl([0, 2.9, s * 1.3], [0.07, 1.3, 0.07], '#6b4226', { rot: [s * 70, 0, 0], anim: [swing([0, 2.9, s * 0.8], [1, 0, 0], 0.08 * s, 1.5), ...a] }));
+      for (let i = 0; i < 3; i++) parts.push(sphere([0.8 - i * 0.03, 3.0 - i * 0.35, 0], 0.08, '#222', { hard: true, anim: a }));
+      for (let i = 0; i < 4; i++) parts.push(sphere([0.58 + Math.cos(i * 0.6) * 0.05, 3.7, (i - 1.5) * 0.14], 0.045, '#222', { hard: true, anim: a }));
+      parts.push(cyl([0, 4.55, 0], [0.7, 0.1, 0.7], '#222', { hard: true, rough: 0.6, anim: a }));
+      parts.push(cyl([0, 4.95, 0], [0.45, 0.75, 0.45], '#222', { hard: true, rough: 0.6, anim: a }));
+      parts.push(torus([0, 3.5, 0], [0.75, 0.15, 0.75], '#b8303a', { hard: true, rough: 0.9, anim: a }));
+      parts.push(box([0.6, 3.1, 0.3], [0.35, 0.8, 0.35], '#b8303a', { hard: true, rough: 0.9, rot: [0, 0, 10], anim: a }));
+      for (const s of [-1, 1]) parts.push(cyl([0, 2.9, s * 1.3], [0.07, 1.3, 0.07], '#6b4226', { hard: true, rough: 0.9, rot: [s * 70, 0, 0], anim: [swing([0, 2.9, s * 0.8], [1, 0, 0], 0.08 * s, 1.5), ...a] }));
       return ground(parts);
     },
     facts: [
@@ -352,16 +352,16 @@ export const WORLD = [
   {
     id: 'robot', name: 'Robot', emoji: '🤖', category: 'Machines',
     aliases: ['robot', 'robots', 'droid', 'android', 'bot'],
-    scene: { sky: ['#1b2440', '#4d6bb3'], ground: '#5f6b85' },
+    scene: { sky: ['#1b2440', '#7f93b8'], ground: '#5b6068', groundType: 'asphalt', sun: [0.4, 0.7, 0.55] },
     build: () => {
       const parts = [];
-      const steel = '#8d99ae', dark = '#3b4a6b';
+      const steel = '#9aa3b2', dark = '#3b4556';
       const a = [bob(0.04, 2)];
-      parts.push(box([0, 1.9, 0], [1.4, 1.5, 0.9], steel, { anim: a }));
+      parts.push(box([0, 1.9, 0], [1.4, 1.5, 0.9], steel, { anim: a, rough: 0.35, metal: 0.8 }));
       parts.push(box([0.46, 2.0, 0], [0.05, 0.6, 0.5], '#1d3557', { anim: a }));
       for (let i = 0; i < 3; i++) parts.push(sphere([0.5, 2.15 - i * 0.15, -0.15 + i * 0.15], 0.06, ['#ff4d4d', '#ffd166', '#06d6a0'][i], { emissive: true, color2: '#fff', anim: [bob(0.04, 2), { type: 'bob', amp: 0, speed: 1 }] }));
       parts.push(cyl([0, 2.75, 0], [0.25, 0.2, 0.25], dark, { anim: a }));
-      parts.push(box([0, 3.35, 0], [1.0, 0.9, 0.9], steel, { anim: a }));
+      parts.push(box([0, 3.35, 0], [1.0, 0.9, 0.9], steel, { anim: a, rough: 0.35, metal: 0.8 }));
       parts.push(box([0.5, 3.4, 0], [0.05, 0.4, 0.7], '#1d3557', { anim: a }));
       parts.push(...eyes([0.52, 3.42, 0], 0.22, 0.1, { white: '#6ff3ff', pupil: '#0b2a3a', anim: a }));
       parts.push(cyl([0, 4.0, 0], [0.05, 0.5, 0.05], dark, { anim: a }));

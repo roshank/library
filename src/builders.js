@@ -22,13 +22,15 @@ export const spin = (axis, speed, pivot) => ({ type: 'spin', axis, speed, pivot 
 
 /** Two eyes looking along +X. */
 export function eyes(at, spread, size = 0.14, opts = {}) {
-  const [x, y, z] = at;
+  // Fused heads are rounder than the primitive stacks they come from, so set
+  // the eyeballs a little back and down and they sit in sockets.
+  const [x, y, z] = [at[0] - size * 0.2, at[1] - size * 0.1, at[2]];
   const anim = opts.anim || [];
-  const white = opts.white || '#ffffff', pupil = opts.pupil || '#1b1b2f';
+  const white = opts.white || '#f2efe6', pupil = opts.pupil || '#141418';
   const out = [];
   for (const s of [-1, 1]) {
-    out.push(sphere([x, y, z + s * spread], size, white, { anim, shiny: 60 }));
-    out.push(sphere([x + size * 0.55, y + size * 0.05, z + s * spread * 1.02], size * 0.55, pupil, { anim, shiny: 90 }));
+    out.push(sphere([x, y, z + s * spread], size, white, { anim, hard: true, socket: true, rough: 0.08, pattern: 'none' }));
+    out.push(sphere([x + size * 0.55, y + size * 0.05, z + s * spread * 1.02], size * 0.55, pupil, { anim, hard: true, rough: 0.12, pattern: 'none' }));
   }
   return out;
 }
@@ -140,7 +142,10 @@ export const lighten = (hex, amt = 0.25) => {
 /** Lighter belly patch tucked just inside the underside of a body ellipsoid. */
 export function belly(pos, bodyScale, color, extra = {}) {
   const [bx, by, bz] = bodyScale;
-  return sphere([pos[0] + bx * 0.05, pos[1] - by * 0.3, pos[2]], [bx * 0.82, by * 0.7, bz * 0.88], color, extra);
+  // Same pattern id as the body with both pattern colours = belly colour, so the
+  // markings fade out smoothly instead of stopping at a seam.
+  const patterned = extra.pattern && extra.pattern !== 'mottle' ? { pattern: extra.pattern, patternScale: extra.patternScale, color2: color } : {};
+  return sphere([pos[0] + bx * 0.05, pos[1] - by * 0.3, pos[2]], [bx * 0.82, by * 0.7, bz * 0.88], color, { ...extra, ...patterned });
 }
 
 /** Snap every part's lowest point so the model rests on the ground. */

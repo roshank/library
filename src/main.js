@@ -3,6 +3,7 @@ import { LIBRARY, BY_ID } from './library.js';
 import { findConcept, suggest } from './search.js';
 import { mysteryConcept } from './mystery.js';
 import { speech } from './speech.js';
+import { buildModel } from './model.js';
 
 const $ = (sel) => document.querySelector(sel);
 const canvas = $('#stage');
@@ -12,6 +13,26 @@ const input = $('#q');
 const starsEl = $('#stars');
 const readToggle = $('#read-aloud');
 const dialog = $('#celebrate');
+const buildingPill = $('#building');
+
+// ---------- 3D model loading (sculpted off-thread; stale results are dropped)
+let loadToken = 0;
+async function showModel(concept) {
+  if (!renderer) return;
+  const token = ++loadToken;
+  canvas.classList.add('building');
+  const pill = setTimeout(() => { if (token === loadToken) buildingPill.hidden = false; }, 350);
+  try {
+    const model = await buildModel(concept, (env) => { if (token === loadToken) renderer.setModel(env); });
+    if (token !== loadToken) return;
+    renderer.setModel(model);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    clearTimeout(pill);
+    if (token === loadToken) { buildingPill.hidden = true; canvas.classList.remove('building'); }
+  }
+}
 
 // ---------- persistent progress (small, per-device; fine for a kids' game)
 const store = {
@@ -28,6 +49,7 @@ readToggle.addEventListener('change', () => { store.set('ww:readAloud', readTogg
 let renderer;
 try {
   renderer = new Renderer(canvas);
+  if (new URL(location.href).searchParams.has('debug')) window.__renderer = renderer;
 } catch (err) {
   console.error(err);
   $('#nogl').hidden = false;
@@ -82,7 +104,7 @@ function showHome() {
     const chips = $('#chips');
     pickSuggestions().forEach((c) => chips.append(chip(c)));
   });
-  if (renderer) renderer.setModel(BY_ID.trex.build(), BY_ID.trex.scene);
+  showModel(BY_ID.trex);
 }
 
 function load(query) {
@@ -98,7 +120,7 @@ function load(query) {
   state.quiz = 0;
   state.correct = 0;
   state.answered = false;
-  if (renderer) renderer.setModel(concept.build(), concept.scene);
+  showModel(concept);
   showFact();
 }
 

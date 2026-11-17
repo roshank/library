@@ -1,10 +1,10 @@
 // Offline-first app shell. Bump VERSION whenever any shipped file changes.
-const VERSION = 'ww-v1';
+const VERSION = 'ww-v2';
 const SHELL = [
   './', './index.html', './styles.css', './manifest.webmanifest', './icons/icon.svg',
   './src/main.js', './src/renderer.js', './src/mat.js', './src/primitives.js', './src/builders.js',
   './src/library.js', './src/library-dinos.js', './src/library-animals.js', './src/library-world.js',
-  './src/search.js', './src/mystery.js', './src/speech.js',
+  './src/search.js', './src/mystery.js', './src/speech.js', './src/sdf.js', './src/mesh-worker.js', './src/model.js',
 ];
 
 self.addEventListener('install', (e) => {

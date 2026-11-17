@@ -358,7 +358,7 @@ export const ANIMALS = [
       parts.push(sphere([0.1, 2.55, 0], [0.62, 0.6, 0.62], '#2b3147', { anim: a }));
       parts.push(sphere([0.45, 2.5, 0], [0.32, 0.4, 0.44], '#fbfbfb', { anim: a }));
       parts.push(cone([0.75, 2.42, 0], [0.12, 0.45, 0.12], '#ffcb2b', { rot: [0, 0, -95], anim: a }));
-      parts.push(...eyes([0.55, 2.7, 0], 0.26, 0.09, { anim: a }));
+      parts.push(...eyes([0.72, 2.72, 0], 0.24, 0.085, { anim: a }));
       for (const s of [-1, 1]) {
         parts.push(sphere([0, 1.4, s * 0.85], [0.35, 0.8, 0.12], '#2b3147', { rot: [s * 15, 0, 0], anim: [swing([0, 1.9, s * 0.8], [1, 0, 0], 0.4 * s, 3), ...a] }));
         parts.push(sphere([0.3, 0.1, s * 0.35], [0.45, 0.12, 0.3], '#ffcb2b', { anim: [bob(0.08, 3, s > 0 ? 0 : Math.PI)] }));
@@ -415,7 +415,7 @@ export const ANIMALS = [
     ],
   },
   {
-    id: 'butterfly', name: 'Butterfly', emoji: '🦋', category: 'Animals',
+    id: 'butterfly', name: 'Butterfly', emoji: '🦋', category: 'Animals', mesh: 'parts',
     aliases: ['butterfly', 'butterflies', 'buterfly', 'monarch'],
     scene: meadow,
     material: { skin: 'fur', rough: 0.7, sss: 0.2 },

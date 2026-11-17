@@ -255,24 +255,25 @@ export const WORLD = [
     ],
   },
   {
-    id: 'volcano', name: 'Volcano', emoji: '🌋', category: 'Nature', mesh: 'organic', material: { skin: 'rough', pattern: 'mottle', rough: 0.9, sss: 0.0 },
+    id: 'volcano', name: 'Volcano', emoji: '🌋', category: 'Nature',
     aliases: ['volcano', 'volcanoes', 'volcanos', 'lava', 'vulcano'],
-    scene: { sky: ['#3a2a2a', '#a35a3a'], ground: '#3b332f', groundType: 'rock', sun: [-0.3, 0.35, 0.6], sunColor: '#ffb080', sunPower: 2.6, fog: 0.0002 },
+    scene: { sky: ['#3a2a2a', '#a35a3a'], ground: '#3b332f', groundType: 'rock', sun: [-0.3, 0.45, 0.6], sunColor: '#ffc090', sunPower: 3.6, fog: 0.0002 },
     build: () => {
       const parts = [];
-      parts.push(cone([0, 1.6, 0], [3.2, 3.2, 3.2], '#4a3b33', { blend: 0.5 }));
-      for (let i = 0; i < 7; i++) parts.push(sphere([Math.cos(i * 0.9) * (1.2 + i * 0.12), 0.5 + (i % 3) * 0.3, Math.sin(i * 0.9) * (1.2 + i * 0.12)], [0.9, 0.6, 0.8], '#4a3b33', { blend: 0.5 }));
-      parts.push(cyl([0, 3.0, 0], [0.9, 0.6, 0.9], '#302622', { blend: 0.3 }));
+      parts.push(cone([0, 1.6, 0], [3.2, 3.2, 3.2], '#4a3b33', { rough: 0.95, skin: 'rough', pattern: 'mottle', color2: '#2e2420', patternScale: 1.5 }));
+      for (let i = 0; i < 7; i++) parts.push(sphere([Math.cos(i * 0.9) * (1.6 + i * 0.1), 0.25, Math.sin(i * 0.9) * (1.6 + i * 0.1)], [0.9, 0.5, 0.8], '#4a3b33', { rough: 0.95, skin: 'rough', pattern: 'mottle', color2: '#2e2420', patternScale: 1.5 }));
+      parts.push(cyl([0, 3.0, 0], [0.9, 0.6, 0.9], '#302622', { rough: 0.95, skin: 'rough' }));
       parts.push(cyl([0, 3.3, 0], [0.7, 0.1, 0.7], '#ff6a00', { hard: true, emissive: true, color2: '#ffd166' }));
       // lava streams
+      // lava streams hug the slope: cone surface height at radius r is 3.2 - r
       for (const ang of [0.4, 2.2, 4.1]) {
-        for (let i = 0; i < 4; i++) {
-          const t = (i + 0.5) / 4;
-          parts.push(sphere([Math.cos(ang) * (0.8 + t * 2.0), 3.0 - t * 2.6, Math.sin(ang) * (0.8 + t * 2.0)], [0.3, 0.12, 0.3], '#ff5400', { hard: true, emissive: true, color2: '#ffd166' }));
+        for (let i = 0; i < 6; i++) {
+          const r = 0.9 + i * 0.42;
+          parts.push(sphere([Math.cos(ang) * r, 3.2 - r + 0.04, Math.sin(ang) * r], [0.34, 0.1, 0.26], '#ff5400', { hard: true, emissive: true, color2: '#ffd166', rot: [0, (-ang * 180) / Math.PI, 45] }));
         }
       }
       // smoke & embers
-      for (let i = 0; i < 6; i++) parts.push(sphere([Math.sin(i) * 0.4, 3.8 + i * 0.45, Math.cos(i * 1.3) * 0.4], 0.45 + i * 0.12, '#6c6c74', { alpha: 0.6, anim: [bob(0.15, 1.2, i)] }));
+      for (let i = 0; i < 6; i++) parts.push(sphere([Math.sin(i) * 0.5, 4.0 + i * 0.5, Math.cos(i * 1.3) * 0.5], 0.5 + i * 0.14, '#b8b4b0', { alpha: 0.45, rough: 1, anim: [bob(0.15, 1.2, i)] }));
       for (let i = 0; i < 7; i++) parts.push(sphere([Math.cos(i * 0.9) * 0.5, 3.6 + (i % 3) * 0.5, Math.sin(i * 0.9) * 0.5], 0.09, '#ffb703', { emissive: true, color2: '#fff', anim: [bob(0.5, 2.5 + i * 0.3, i)] }));
       return parts;
     },

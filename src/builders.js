@@ -111,7 +111,7 @@ export function spine({ fromX, toX, y, count, size, color, color2, pattern, shap
     const yy = typeof y === 'function' ? y(t) : y;
     const zs = doubleRow ? [-widthZ * 0.5, widthZ * 0.5] : [0];
     for (const z of zs) {
-      const sc = plate ? [s * 0.8, s, s * 0.22] : [s * 0.3, s, s * 0.3];
+      const sc = plate ? [s * 0.5, s, s * 0.2] : [s * 0.3, s, s * 0.3];
       out.push(part(shape, [x, yy + s * 0.5, z], sc, color, { color2, pattern, rot: [0, 0, rotZ], anim: [bob(0.03, 2.4)] }));
     }
   }

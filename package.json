@@ -1,0 +1,11 @@
+{
+  "name": "wonder-world-3d",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Type a concept, meet it in 3D, learn five facts and take a mini quiz. A WebGL2 learning game for 5-year-olds.",
+  "type": "module",
+  "scripts": {
+    "start": "npx -y serve -l 3000 .",
+    "check": "node --input-type=module -e \"import('./src/library.js').then(m => { for (const c of m.LIBRARY) c.build(); console.log(m.LIBRARY.length + ' concepts build OK'); })\""
+  }
+}

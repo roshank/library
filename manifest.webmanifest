@@ -1,0 +1,14 @@
+{
+  "name": "Wonder World 3D",
+  "short_name": "Wonder World",
+  "description": "Type a dinosaur, animal, planet or machine and meet it in 3D with fun facts for little learners.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eaf6ff",
+  "theme_color": "#4dabf7",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

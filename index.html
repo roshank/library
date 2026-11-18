@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#4dabf7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1b2440" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="Type a dinosaur, animal, planet or machine and meet it in 3D with fun facts for little learners.">
+  <title>Wonder World 3D</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="stage" aria-label="3D view of the thing you are learning about. Drag to spin it, pinch or scroll to zoom." role="img"></canvas>
+
+  <header class="top">
+    <button type="button" id="home-btn" class="logo" aria-label="Wonder World home">
+      <span aria-hidden="true">🌍</span> Wonder World <small>3D</small>
+    </button>
+    <form id="search" role="search" autocomplete="off">
+      <label for="q" class="sr-only">What do you want to learn about?</label>
+      <input id="q" name="q" type="search" list="names" placeholder="Type a dinosaur, animal, planet…"
+             enterkeyhint="go" autocapitalize="words" spellcheck="false" maxlength="40" required>
+      <datalist id="names"></datalist>
+      <button type="submit" class="btn primary">Show me!</button>
+      <button type="button" id="surprise" class="btn ghost" title="Surprise me">🎲</button>
+    </form>
+    <div class="right">
+      <label class="switch"><input type="checkbox" id="read-aloud"><span>🔊 Read aloud</span></label>
+      <div class="stars" role="status"><span aria-hidden="true">⭐</span> <b id="stars">0</b></div>
+    </div>
+  </header>
+
+  <section id="card" class="card home" aria-live="polite"></section>
+
+  <div id="building" class="building-pill" hidden>Sculpting…</div>
+
+  <div id="nogl" class="card" hidden>
+    <h2>Oh no!</h2>
+    <p>This browser cannot draw 3D pictures (it needs WebGL2). Try a newer Chrome, Edge, Firefox or Safari.</p>
+  </div>
+
+  <dialog id="celebrate">
+    <div class="big" id="celebrate-emoji" aria-hidden="true">🎉</div>
+    <h2>Hooray!</h2>
+    <p id="celebrate-text"></p>
+    <p class="sticker" id="celebrate-sticker"></p>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="again">Learn it again</button>
+      <button type="button" class="btn primary" id="another" autofocus>Learn something new</button>
+    </div>
+  </dialog>
+
+  <div id="confetti" aria-hidden="true"></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

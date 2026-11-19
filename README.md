@@ -17,6 +17,16 @@ python3 -m http.server 3000
 Serve it over HTTP rather than opening the file directly: the mesh worker and
 the service worker both need it.
 
+## Live demo
+
+Every push to `main` is published to GitHub Pages by
+`.github/workflows/pages.yml` at **https://roshank.github.io/library/**. The
+workflow enables Pages on first run; if the deploy step reports that Pages is
+not configured, open the repository's Settings → Pages and set the source to
+"GitHub Actions", then re-run the workflow. All asset paths are relative, so the
+app also works from any other static host (Netlify, Vercel, an S3 bucket) with
+no configuration.
+
 ## How it works
 
 | Piece | File | Notes |
